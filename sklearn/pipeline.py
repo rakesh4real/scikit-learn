@@ -475,6 +475,27 @@ class Pipeline(_BaseComposition):
         return self.steps[-1][-1].predict_proba(Xt)
 
     @if_delegate_has_method(delegate='_final_estimator')
+    def _predict_proba_lr(self, X):
+        """Apply transforms, and _predict_proba_lr of the final estimator
+        if the final estimator is LinearSVC
+
+        Parameters
+        ----------
+        X : iterable
+            Data to predict on. Must fulfill input requirements of first step
+            of the pipeline.
+
+        Returns
+        -------
+        y_proba : array-like of shape (n_samples, n_classes)
+        """
+        Xt = X
+        for _, name, transform in self._iter(with_final=False):
+            Xt = transform.transform(Xt)
+        return self.steps[-1][-1]._predict_proba_lr(Xt)
+
+    
+    @if_delegate_has_method(delegate='_final_estimator')
     def decision_function(self, X):
         """Apply transforms, and decision_function of the final estimator
 
